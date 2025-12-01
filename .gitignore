@@ -9,3 +9,5 @@ packages/contracts/.env.hardhat.local
 apps/dao-dapp/src/contracts/*
 !apps/dao-dapp/src/contracts/.gitkeep
 .github/workflows
+.DS_Store
+**/.DS_Store
