@@ -1,0 +1,42 @@
+{
+  "name": "dapp_setup",
+  "private": true,
+  "packageManager": "pnpm@10.16.1",
+  "engines": {
+    "node": ">=22 <23"
+  },
+  "scripts": {
+    "web:dev": "pnpm --dir apps/dao-dapp dev",
+    "web:build": "pnpm --dir apps/dao-dapp build",
+    "web:preview": "pnpm --dir apps/dao-dapp preview",
+    "contracts:compile": "pnpm --filter contracts run compile",
+    "contracts:test": "pnpm --filter contracts run test",
+    "contracts:deploy": "pnpm --filter contracts run deploy",
+    "contracts:verify": "pnpm --filter contracts exec hardhat etherscan-verify",
+    "contracts:verify:multi": "pnpm --filter contracts exec ts-node scripts/verify-multi.ts",
+    "contracts:verify:stdjson": "pnpm --filter contracts exec ts-node scripts/verify-stdjson.ts",
+    "contracts:docs": "pnpm --filter contracts run docs",
+    "contracts:lint:natspec": "pnpm --filter contracts run lint:natspec",
+    "contracts:debug": "pnpm --filter contracts exec ts-node scripts/debug-deployment.ts",
+    "contracts:deploy-upgradeable": "pnpm --filter contracts exec ts-node scripts/deploy-upgradeable.ts",
+    "contracts:upgrade": "pnpm --filter contracts exec ts-node scripts/upgrade-contract.ts",
+    "contracts:verify-upgradeable": "pnpm --filter contracts exec ts-node scripts/verify-upgradeable.ts",
+    "anvil:start": "anvil --block-time 1",
+    "anvil:stop": "pkill -f '^anvil( |$)' || true",
+    "foundry:update": "$HOME/.foundry/bin/foundryup",
+    "forge:test": "forge test -vvv",
+    "forge:fmt": "forge fmt",
+    "check:all": "pnpm check:frontend && pnpm check:contracts",
+    "check:frontend": "pnpm --dir apps/dao-dapp exec eslint . --ext .ts,.tsx && pnpm web:build",
+    "check:contracts": "pnpm contracts:compile && pnpm contracts:test && pnpm forge:test",
+    "check:quick": "pnpm --dir apps/dao-dapp exec eslint . --ext .ts,.tsx && pnpm --filter contracts exec solhint 'contracts/**/*.sol' || true",
+    "check:full": "pnpm check:all",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.3"
+  }
+}

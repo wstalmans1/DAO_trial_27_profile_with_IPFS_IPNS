@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Node16",
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "Node16",
+    "resolveJsonModule": true,
+    "outDir": "dist",
+    "types": ["node", "hardhat"]
+  },
+  "include": ["hardhat.config.ts", "deploy", "scripts", "test", "typechain-types"],
+  "exclude": ["dist"]
+}

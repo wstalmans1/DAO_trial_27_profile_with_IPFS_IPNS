@@ -1,0 +1,50 @@
+{
+  "name": "dao-dapp",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fleek-platform/sdk": "^3.7.2",
+    "@helia/ipns": "^2.0.3",
+    "@helia/unixfs": "^2.0.1",
+    "@libp2p/crypto": "^2.0.8",
+    "@noble/curves": "^1.9.7",
+    "@noble/hashes": "^1.8.0",
+    "@rainbow-me/rainbowkit": "~2.2.9",
+    "@storacha/client": "^1.8.20",
+    "@tanstack/react-query": "~5.90.11",
+    "@tanstack/react-query-devtools": "~5.90.2",
+    "axios": "^1.13.2",
+    "helia": "^2.1.0",
+    "pinata": "^1.10.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "viem": "~2.37.13",
+    "wagmi": "~2.16.9",
+    "zod": "~3.22.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@tailwindcss/postcss": "~4.0.17",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
+    "@vitejs/plugin-react": "^4.4.1",
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "postcss": "~8.4.49",
+    "tailwindcss": "~4.0.17",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.30.1",
+    "vite": "^6.3.5"
+  }
+}

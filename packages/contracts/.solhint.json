@@ -1,0 +1,14 @@
+{
+  "extends": ["solhint:recommended"],
+  "rules": {
+    "func-visibility": ["error", { "ignoreConstructors": true }],
+    "max-line-length": ["warn", 120],
+    "natspec": "error",
+    "natspec-return": "error",
+    "natspec-param": "error",
+    "natspec-constructor": "error",
+    "natspec-function": "error",
+    "natspec-event": "error",
+    "natspec-modifier": "error"
+  }
+}

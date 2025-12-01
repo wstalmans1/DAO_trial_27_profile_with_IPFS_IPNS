@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+echo "Running pre-push checks (compile + tests)..."
+echo ""
+
+# Compile contracts
+echo "Compiling contracts..."
+if ! pnpm contracts:compile; then
+  echo "❌ Contract compilation failed. Fix errors before pushing."
+  exit 1
+fi
+
+# Run Hardhat tests
+echo "Running Hardhat tests..."
+if ! pnpm contracts:test; then
+  echo "❌ Hardhat tests failed. Fix tests before pushing."
+  exit 1
+fi
+
+# Run Foundry tests (if available)
+if command -v forge >/dev/null 2>&1; then
+  echo "Running Foundry tests..."
+  if ! pnpm forge:test; then
+    echo "❌ Foundry tests failed. Fix tests before pushing."
+    exit 1
+  fi
+else
+  echo "⚠️  Foundry not found, skipping Foundry tests"
+fi
+
+echo "✅ All pre-push checks passed!"
