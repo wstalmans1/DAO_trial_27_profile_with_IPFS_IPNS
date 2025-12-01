@@ -59,6 +59,9 @@ importers:
       helia:
         specifier: ^2.1.0
         version: 2.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      multiformats:
+        specifier: ^13.4.1
+        version: 13.4.1
       pinata:
         specifier: ^1.10.1
         version: 1.10.1

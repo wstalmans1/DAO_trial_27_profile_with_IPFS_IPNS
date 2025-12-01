@@ -16,15 +16,18 @@ export default [
         console: 'readonly',
         process: 'readonly',
         Buffer: 'readonly',
-        global: 'readonly'
-      }
+        global: 'readonly',
+        alert: 'readonly',
+        TextEncoder: 'readonly',
+        TextDecoder: 'readonly',
+      },
     },
     plugins: {
-      'react-hooks': reactHooks
+      'react-hooks': reactHooks,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules
-    }
+      ...reactHooks.configs.recommended.rules,
+    },
   },
   {
     files: ['**/*.{ts,tsx}'],
@@ -34,8 +37,8 @@ export default [
         ecmaVersion: 'latest',
         sourceType: 'module',
         ecmaFeatures: {
-          jsx: true
-        }
+          jsx: true,
+        },
       },
       globals: {
         window: 'readonly',
@@ -43,18 +46,21 @@ export default [
         console: 'readonly',
         process: 'readonly',
         Buffer: 'readonly',
-        global: 'readonly'
-      }
+        global: 'readonly',
+        alert: 'readonly',
+        TextEncoder: 'readonly',
+        TextDecoder: 'readonly',
+      },
     },
     plugins: {
       'react-hooks': reactHooks,
-      '@typescript-eslint': tseslint
+      '@typescript-eslint': tseslint,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules
-    }
+      ...reactHooks.configs.recommended.rules,
+    },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', '*.config.js', 'vite.config.ts']
-  }
+    ignores: ['dist/**', 'node_modules/**', '*.config.js', 'vite.config.ts'],
+  },
 ]

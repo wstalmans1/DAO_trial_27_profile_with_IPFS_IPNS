@@ -22,6 +22,7 @@
     "@tanstack/react-query-devtools": "~5.90.2",
     "axios": "^1.13.2",
     "helia": "^2.1.0",
+    "multiformats": "^13.4.1",
     "pinata": "^1.10.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

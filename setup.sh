@@ -130,6 +130,9 @@ pnpm --dir apps/dao-dapp add @libp2p/crypto@^2.0.0
 # Cryptography for wallet-based encryption
 pnpm --dir apps/dao-dapp add @noble/curves@^1.0.0 @noble/hashes@^1.0.0
 
+# CID handling for IPFS/IPNS
+pnpm --dir apps/dao-dapp add multiformats@^13.0.0
+
 # HTTP client fallback (for low-end devices, add later)
 # Uncomment when implementing adaptive IPFS service:
 # pnpm --dir apps/dao-dapp add ipfs-http-client@^60.0.0
@@ -861,7 +864,10 @@ export default [
         console: 'readonly',
         process: 'readonly',
         Buffer: 'readonly',
-        global: 'readonly'
+        global: 'readonly',
+        alert: 'readonly',
+        TextEncoder: 'readonly',
+        TextDecoder: 'readonly'
       }
     },
     plugins: {
@@ -888,7 +894,10 @@ export default [
         console: 'readonly',
         process: 'readonly',
         Buffer: 'readonly',
-        global: 'readonly'
+        global: 'readonly',
+        alert: 'readonly',
+        TextEncoder: 'readonly',
+        TextDecoder: 'readonly'
       }
     },
     plugins: {
