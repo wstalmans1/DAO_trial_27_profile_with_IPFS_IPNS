@@ -20,6 +20,9 @@ export default [
         alert: 'readonly',
         TextEncoder: 'readonly',
         TextDecoder: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        fetch: 'readonly',
       },
     },
     plugins: {
@@ -50,6 +53,9 @@ export default [
         alert: 'readonly',
         TextEncoder: 'readonly',
         TextDecoder: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        fetch: 'readonly',
       },
     },
     plugins: {

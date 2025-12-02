@@ -2,6 +2,7 @@ import { createHelia } from 'helia'
 import { unixfs } from '@helia/unixfs'
 import type { Helia } from 'helia'
 import { CID } from 'multiformats/cid'
+import { pinToAllServices, type PinningResult } from './ipfs/pinning'
 
 // Singleton Helia instance
 let heliaInstance: Helia | null = null
@@ -11,7 +12,7 @@ let unixfsInstance: ReturnType<typeof unixfs> | null = null
  * Initialize Helia IPFS node (singleton pattern)
  * @returns Helia instance
  */
-async function getHelia(): Promise<Helia> {
+export async function getHelia(): Promise<Helia> {
   if (heliaInstance) {
     return heliaInstance
   }
@@ -44,16 +45,45 @@ async function getUnixFS() {
 /**
  * Upload data to IPFS
  * @param data - String data to upload
+ * @param autoPin - Automatically pin to configured pinning services (default: true)
  * @returns CID (Content Identifier)
  */
-export async function uploadToIPFS(data: string): Promise<string> {
+export async function uploadToIPFS(data: string, autoPin: boolean = true): Promise<string> {
   try {
     const fs = await getUnixFS()
     const encoder = new TextEncoder()
     const dataBytes = encoder.encode(data)
 
     const cid = await fs.addBytes(dataBytes)
-    return cid.toString()
+    const cidString = cid.toString()
+
+    // Automatically pin to all configured services
+    if (autoPin && heliaInstance) {
+      try {
+        const pinResults = await pinToAllServices(heliaInstance, cidString)
+        const successfulPins = pinResults.filter((r) => r.success)
+        const failedPins = pinResults.filter((r) => !r.success)
+
+        if (successfulPins.length > 0) {
+          console.log(
+            `✓ Pinned ${cidString} to: ${successfulPins.map((r) => r.provider).join(', ')}`,
+          )
+        }
+
+        if (failedPins.length > 0) {
+          console.warn(
+            `⚠ Failed to pin ${cidString} to: ${failedPins
+              .map((r) => `${r.provider} (${r.error})`)
+              .join(', ')}`,
+          )
+        }
+      } catch (pinError) {
+        // Don't fail the upload if pinning fails
+        console.warn('Warning: Auto-pinning failed:', pinError)
+      }
+    }
+
+    return cidString
   } catch (error) {
     console.error('Error uploading to IPFS:', error)
     throw new Error('Failed to upload to IPFS')
@@ -98,11 +128,12 @@ export async function getFromIPFS(cid: string): Promise<string> {
 /**
  * Upload JSON object to IPFS
  * @param data - Object to upload
+ * @param autoPin - Automatically pin to configured pinning services (default: true)
  * @returns CID
  */
-export async function uploadJSONToIPFS(data: object): Promise<string> {
+export async function uploadJSONToIPFS(data: object, autoPin: boolean = true): Promise<string> {
   const jsonString = JSON.stringify(data, null, 2)
-  return uploadToIPFS(jsonString)
+  return uploadToIPFS(jsonString, autoPin)
 }
 
 /**
@@ -125,4 +156,19 @@ export async function stopHelia(): Promise<void> {
     heliaInstance = null
     unixfsInstance = null
   }
+}
+
+/**
+ * Manually pin a CID to all configured pinning services
+ * @param cid - CID to pin
+ * @returns Array of pinning results
+ */
+export async function pinCID(cid: string): Promise<PinningResult[]> {
+  if (!heliaInstance) {
+    await getHelia()
+  }
+  if (!heliaInstance) {
+    throw new Error('Helia instance not available')
+  }
+  return pinToAllServices(heliaInstance, cid)
 }

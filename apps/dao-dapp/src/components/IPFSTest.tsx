@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
-import { uploadToIPFS, getFromIPFS, stopHelia } from '../services/ipfs'
+import { uploadToIPFS, getFromIPFS, stopHelia, pinCID } from '../services/ipfs'
+import { checkPinningStatus } from '../services/ipfs/pinning'
+import { getHelia } from '../services/ipfs'
 
 export default function IPFSTest() {
   const [cid, setCid] = useState<string>('')
@@ -8,6 +10,12 @@ export default function IPFSTest() {
   const [error, setError] = useState<string>('')
   const [success, setSuccess] = useState<string>('')
   const [initializing, setInitializing] = useState(true)
+  const [pinningStatus, setPinningStatus] = useState<{
+    pinata: boolean
+    localNode: boolean
+    heliaLocal: boolean
+  } | null>(null)
+  const [pinningInProgress, setPinningInProgress] = useState(false)
 
   // Initialize Helia on mount
   useEffect(() => {
@@ -33,15 +41,59 @@ export default function IPFSTest() {
     setLoading(true)
     setError('')
     setSuccess('')
+    setPinningStatus(null)
     try {
       const testData = `Test data uploaded at ${new Date().toISOString()}`
-      const uploadedCid = await uploadToIPFS(testData)
+      const uploadedCid = await uploadToIPFS(testData, true) // Auto-pin enabled
       setCid(uploadedCid)
       setSuccess(`Uploaded successfully! CID: ${uploadedCid}`)
+
+      // Check pinning status after a short delay
+      setTimeout(async () => {
+        try {
+          const helia = await getHelia()
+          const status = await checkPinningStatus(helia, uploadedCid)
+          setPinningStatus(status)
+        } catch (err) {
+          console.warn('Could not check pinning status:', err)
+        }
+      }, 1000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleManualPin = async () => {
+    if (!cid) {
+      setError('Please upload data first')
+      return
+    }
+
+    setPinningInProgress(true)
+    setError('')
+    try {
+      const results = await pinCID(cid)
+      const successful = results.filter((r) => r.success)
+      const failed = results.filter((r) => !r.success)
+
+      if (successful.length > 0) {
+        setSuccess(`Pinned to: ${successful.map((r) => r.provider).join(', ')}`)
+      }
+
+      if (failed.length > 0) {
+        setError(`Failed: ${failed.map((r) => `${r.provider} (${r.error})`).join(', ')}`)
+      }
+
+      // Update pinning status
+      const helia = await getHelia()
+      const status = await checkPinningStatus(helia, cid)
+      setPinningStatus(status)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Manual pinning failed')
+    } finally {
+      setPinningInProgress(false)
     }
   }
 
@@ -86,15 +138,72 @@ export default function IPFSTest() {
         </button>
 
         {cid && (
-          <div>
+          <div className="space-y-2">
             <p className="text-sm text-slate-400 mb-2">CID: {cid}</p>
-            <button
-              onClick={handleRetrieve}
-              disabled={loading}
-              className="px-4 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 rounded-lg disabled:opacity-50"
-            >
-              {loading ? 'Retrieving...' : 'Retrieve Data'}
-            </button>
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={handleRetrieve}
+                disabled={loading}
+                className="px-4 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 rounded-lg disabled:opacity-50"
+              >
+                {loading ? 'Retrieving...' : 'Retrieve Data'}
+              </button>
+              <button
+                onClick={handleManualPin}
+                disabled={pinningInProgress}
+                className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg disabled:opacity-50"
+              >
+                {pinningInProgress ? 'Pinning...' : 'Pin Manually'}
+              </button>
+            </div>
+
+            {pinningStatus && (
+              <div className="mt-2 p-3 bg-slate-900/50 rounded-lg">
+                <p className="text-xs text-slate-400 mb-1">Pinning Status:</p>
+                <div className="space-y-1 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        pinningStatus.heliaLocal ? 'bg-green-500' : 'bg-gray-500'
+                      }`}
+                    />
+                    <span className="text-slate-300">
+                      Helia Local: {pinningStatus.heliaLocal ? '✓ Pinned' : '✗ Not pinned'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        pinningStatus.pinata ? 'bg-green-500' : 'bg-gray-500'
+                      }`}
+                    />
+                    <span className="text-slate-300">
+                      Pinata:{' '}
+                      {pinningStatus.pinata
+                        ? '✓ Pinned'
+                        : import.meta.env.VITE_PINATA_JWT
+                          ? '✗ Not pinned'
+                          : '○ Not configured'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        pinningStatus.localNode ? 'bg-green-500' : 'bg-gray-500'
+                      }`}
+                    />
+                    <span className="text-slate-300">
+                      Local Node:{' '}
+                      {pinningStatus.localNode
+                        ? '✓ Pinned'
+                        : import.meta.env.VITE_LOCAL_IPFS_API
+                          ? '✗ Not pinned'
+                          : '○ Not configured'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
