@@ -19,7 +19,7 @@ Helia runs a full IPFS node in your browser, but for persistence across sessions
 
 ### Option A: Storacha (Recommended for learning)
 1. Go to https://console.storacha.network or install CLI:
-   ```bash
+```bash
    pnpm dlx @storacha/cli@latest
    storacha login your@email.com
    ```
